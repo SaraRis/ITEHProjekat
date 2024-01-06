@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -24,3 +25,18 @@ Route::get('/users', [UserController::class, 'index']);
 Route::get('/users/{user_id}', [UserController::class, 'show']);
 
 Route::resource('/posts', PostController::class);
+
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::group(['middleware' => ['auth:sanctum']], function () { //ovo su zasticene rute
+    Route::get('/profile', function(Request $request) {
+        return auth()->user();
+    });
+    Route::resource('posts', PostController::class)->only(['update','store','destroy']);
+
+    // API route for logout user
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
+//ako je poslat token validan, onda ce moci da se pristupi stranicama na ove 3 rute, a u suprotnom, nece moci da se pristupi
+
